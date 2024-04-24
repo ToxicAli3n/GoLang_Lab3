@@ -1,4 +1,4 @@
-package painter
+package Painter
 
 import (
 	"image"

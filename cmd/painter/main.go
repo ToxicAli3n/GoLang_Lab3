@@ -13,18 +13,18 @@ func main() {
 		pv ui.Visualizer // Візуалізатор створює вікно та малює у ньому.
 
 		// Потрібні для частини 2.
-		opLoop painter.Loop // Цикл обробки команд.
-		parser lang.Parser  // Парсер команд.
+		opLoop Painter.Loop // Цикл обробки команд.
+		parser Lang.Parser  // Парсер команд.
 	)
 
 	//pv.Debug = true
-	pv.Title = "Simple painter"
+	pv.Title = "Simple Painter"
 
 	pv.OnScreenReady = opLoop.Start
 	opLoop.Receiver = &pv
 
 	go func() {
-		http.Handle("/", lang.HttpHandler(&opLoop, &parser))
+		http.Handle("/", Lang.HttpHandler(&opLoop, &parser))
 		_ = http.ListenAndServe("localhost:17000", nil)
 	}()
 
