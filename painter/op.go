@@ -22,11 +22,11 @@ type StateTweaker interface {
 type StatefulOperationList struct {
 	BgOperation      Operation
 	BgRectOperation  Operation
-	FigureOperations []Operation
+	FigureOperations []*OperationFigure
 }
 
 // Do виконує всі операції в списку.
-func (sol *StatefulOperationList) Do(t screen.Texture) bool {
+func (sol StatefulOperationList) Do(t screen.Texture) bool {
 	if sol.BgOperation != nil {
 		sol.BgOperation.Do(t)
 	} else {
@@ -119,10 +119,7 @@ func (op OperationFigure) Do(t screen.Texture) bool {
 }
 
 func (op OperationFigure) SetState(sol *StatefulOperationList) {
-	if sol.FigureOperations == nil {
-		sol.FigureOperations = []Operation{}
-	}
-	sol.FigureOperations = append(sol.FigureOperations, op)
+	sol.FigureOperations = append(sol.FigureOperations, &op)
 }
 
 func drawT(t screen.Texture, center image.Point, hlen, hwidth int, c color.Color) {
@@ -141,12 +138,9 @@ type MoveTweaker struct {
 }
 
 func (tweaker MoveTweaker) SetState(sol *StatefulOperationList) {
-	for i := range sol.FigureOperations {
-		if fig, ok := sol.FigureOperations[i].(OperationFigure); ok {
-			fig.Center.X = tweaker.Offset.X
-			fig.Center.Y = tweaker.Offset.Y
-			sol.FigureOperations[i] = fig
-		}
+	for _, i := range sol.FigureOperations {
+		i.Center.X = tweaker.Offset.X
+		i.Center.Y = tweaker.Offset.Y
 	}
 }
 
@@ -157,5 +151,5 @@ func (tweaker ResetTweaker) SetState(sol *StatefulOperationList) {
 	blackFillOperation := OperationFill{Color: color.Black}
 	sol.BgOperation = blackFillOperation
 	sol.BgRectOperation = nil
-	sol.FigureOperations = nil
+	sol.FigureOperations = []*OperationFigure{}
 }
