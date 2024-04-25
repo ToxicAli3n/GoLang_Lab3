@@ -13,6 +13,8 @@ type Operation interface {
 	Do(t screen.Texture) bool
 }
 
+type OperationList []Operation
+
 // StateTweaker визначає інтерфейс для зміни стану малюнку.
 type StateTweaker interface {
 	SetState(sol *StatefulOperationList)
@@ -51,14 +53,14 @@ func defaultFill(t screen.Texture, c color.Color) {
 	t.Fill(t.Bounds(), c, screen.Src)
 }
 
-// UpdateOp сигналізує, що текстура готова.
+// UpdateOp операція, яка не змінює текстуру, але сигналізує, що текстуру потрібно розглядати як готову.
 var UpdateOp = updateOp{}
 
 type updateOp struct{}
 
-func (op updateOp) Do(t screen.Texture) bool { return true }
+func (op updateOp) Do(screen.Texture) bool { return true }
 
-// OperationFunc адаптує функцію до Operation.
+// OperationFunc використовується для перетворення функції оновлення текстури в Operation.
 type OperationFunc func(t screen.Texture)
 
 func (f OperationFunc) Do(t screen.Texture) bool {
@@ -125,7 +127,6 @@ func (op OperationFigure) SetState(sol *StatefulOperationList) {
 	sol.FigureOperations = append(sol.FigureOperations, op)
 }
 
-// drawCross малює хрест у вказаному місці.
 func drawT(t screen.Texture, center image.Point, hlen, hwidth int, c color.Color) {
 
 	topHorizontal := image.Rect(center.X-hlen, center.Y-hwidth, center.X+hlen, center.Y)
@@ -136,7 +137,6 @@ func drawT(t screen.Texture, center image.Point, hlen, hwidth int, c color.Color
 	t.Fill(bottomVertical, c, draw.Src)
 }
 
-// MoveTweaker зміщує фігури.
 // MoveTweaker зміщує фігури.
 type MoveTweaker struct {
 	Offset RelativePoint

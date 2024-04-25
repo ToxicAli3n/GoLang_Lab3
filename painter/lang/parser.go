@@ -23,14 +23,11 @@ func (p *Parser) Parse(in io.Reader) ([]Painter.Operation, error) {
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
 		commandLine := scanner.Text()
-		// Отримуємо відповідну до команди структуру.
 		op, err := p.process(commandLine)
 
 		if err != nil {
-			// Якщо виникла неопізнана помилка при обробці операції, повертаємо цю помилку.
 			return nil, err
 		} else if op != nil {
-			// Додаємо операцію у список до передачі в цикл.
 			res = append(res, op)
 		}
 	}
@@ -44,11 +41,9 @@ func (e countError) Error() string {
 	return "Invalid argument count"
 }
 
-// process обробляє текстову команду, повертаючи співвідносну операцію для додання в чергу. Враховує потребу редагування стану.
 func (p *Parser) process(cmd string) (Painter.Operation, error) {
 	var tweaker Painter.StateTweaker
 
-	// Розділяємо строку на окремі текстові строки команди за пропусками.
 	fields := strings.Fields(cmd)
 	switch fields[0] {
 	case "white":
@@ -97,13 +92,12 @@ func (p *Parser) process(cmd string) (Painter.Operation, error) {
 		}
 		tweaker = Painter.ResetTweaker{}
 	default:
-		return nil, fmt.Errorf("Unknown command")
+		return nil, fmt.Errorf("unknown command")
 	}
 
 	if nil != tweaker {
 		p.state.Update(tweaker)
 	}
-	// Надсилаємо операцію зі станом у цикл подій, якщо більше ніякої не поверталося.
 	return &p.state, nil
 }
 
@@ -115,12 +109,12 @@ func processArguments(args []string, requiredLen int) ([]float64, error) {
 	for idx, arg := range args {
 		num, err := strconv.ParseFloat(arg, 64)
 		if err != nil {
-			return nil, fmt.Errorf("Invalid argument at pos %d", idx)
+			return nil, fmt.Errorf("invalid argument at pos %d", idx)
 		}
 		if num >= -1 && num <= 1 {
 			processed = append(processed, num)
 		} else {
-			return nil, fmt.Errorf("Value at pos %d is not in [-1,1] range", idx)
+			return nil, fmt.Errorf("value at pos %d is not in [-1,1] range", idx)
 		}
 	}
 
