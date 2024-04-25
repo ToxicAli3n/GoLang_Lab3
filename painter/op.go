@@ -13,8 +13,6 @@ type Operation interface {
 	Do(t screen.Texture) bool
 }
 
-type OperationList []Operation
-
 // StateTweaker визначає інтерфейс для зміни стану малюнку.
 type StateTweaker interface {
 	SetState(sol *StatefulOperationList)
