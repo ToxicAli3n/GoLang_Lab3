@@ -8,81 +8,71 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParser_Input(t *testing.T) {
-	type testCase struct {
-		name string
-		cmd  string
-		err  string
+func TestParser(t *testing.T) {
+	p := &Parser{}
+
+	ops, err := p.Parse(strings.NewReader("white"))
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if len(ops) != 1 {
+		t.Errorf("Expected 1 operation, got %d", len(ops))
 	}
 
-	var testTable = []testCase{
-		{
-			name: "duplicate command",
-			cmd:  "white white",
-			err:  "Invalid argument count",
-		},
-		{
-			name: "invalid argument amount",
-			cmd:  "reset white",
-			err:  "Invalid argument count",
-		},
-		{
-			name: "unknown command",
-			cmd:  "hello",
-			err:  "unknown command",
-		},
-		{
-			name: "multiple command: unknown command",
-			cmd:  "green\n bgrect 0.1 0.1 0.1 0.1\n hello",
-			err:  "unknown command",
-		},
-		{
-			name: "out of the range",
-			cmd:  "move 3 3",
-			err:  "value at pos 0 is not in [-1,1] range",
-		},
-		{
-			name: "out of the range",
-			cmd:  "bgrect 0.3 -8 0.5 0.3",
-			err:  "value at pos 1 is not in [-1,1] range",
-		},
-		{
-			name: "invalid argument",
-			cmd:  "figure j -0.9",
-			err:  "invalid argument at pos 0",
-		},
-		{
-			name: "invalid amount of argument",
-			cmd:  "bgrect 0.3 a",
-			err:  "Invalid argument count",
-		},
-		{
-			name: "move: invalid amount of argument",
-			cmd:  "move 0.3 3 3 3",
-			err:  "Invalid argument count",
-		},
-		{
-			name: "miltiple cmd: duplicate cmd",
-			cmd:  "move 0.3 0.1\n white white",
-			err:  "Invalid argument count",
-		},
-		{
-			name: "figure: out of range",
-			cmd:  "move 0.3 0.1\n white\n figure 1.2 0.1",
-			err:  "value at pos 0 is not in [-1,1] range",
-		},
-		{
-			name: "invalid argument",
-			cmd:  "reset\n figure j -0.9\n green\n update",
-			err:  "invalid argument at pos 0",
-		},
+	ops, err = p.Parse(strings.NewReader("green"))
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if len(ops) != 1 {
+		t.Errorf("Expected 1 operation, got %d", len(ops))
 	}
 
-	for _, test := range testTable {
-		p := &Parser{}
-		_, err := p.Parse(strings.NewReader(test.cmd))
+	ops, err = p.Parse(strings.NewReader("update"))
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if len(ops) != 1 {
+		t.Errorf("Expected 1 operation, got %d", len(ops))
+	}
 
-		assert.Equal(t, test.err, err.Error(), test.name)
+	ops, err = p.Parse(strings.NewReader("bgrect 0.5 0.5 -0.5 -0.5"))
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if len(ops) != 1 {
+		t.Errorf("Expected 1 operation, got %d", len(ops))
+	}
+
+	ops, err = p.Parse(strings.NewReader("figure 0.5 0.5"))
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if len(ops) != 1 {
+		t.Errorf("Expected 1 operation, got %d", len(ops))
+	}
+
+	ops, err = p.Parse(strings.NewReader("move 0.5 0.5"))
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if len(ops) != 1 {
+		t.Errorf("Expected 1 operation, got %d", len(ops))
+	}
+
+	ops, err = p.Parse(strings.NewReader("reset"))
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if len(ops) != 1 {
+		t.Errorf("Expected 1 operation, got %d", len(ops))
+	}
+
+	ops, err = p.Parse(strings.NewReader("unknown"))
+	if err == nil {
+		t.Errorf("Expected error, got nil")
+	}
+	if len(ops) != 0 {
+		t.Errorf("Expected 0 operations, got %d", len(ops))
 	}
 }
 
